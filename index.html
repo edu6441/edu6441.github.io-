@@ -43,13 +43,11 @@
 
   ::selection{ background: var(--neon-glow); color: #fff; }
 
-  /* ---------- Scrollbars ---------- */
   ::-webkit-scrollbar{ width: 8px; height: 8px; }
   ::-webkit-scrollbar-track{ background: transparent; }
   ::-webkit-scrollbar-thumb{ background: rgba(0,229,255,0.25); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover{ background: rgba(0,229,255,0.45); }
 
-  /* ---------- Top bar ---------- */
   .topbar{
     height: 56px;
     display: flex;
@@ -101,14 +99,12 @@
     cursor: pointer;
   }
 
-  /* ---------- Layout ---------- */
   .layout{
     display: grid;
     grid-template-columns: 280px 1fr;
     min-height: calc(100vh - 56px);
   }
 
-  /* ---------- Sidebar (file explorer style) ---------- */
   .sidebar{
     border-right: 1px solid var(--border-soft);
     background: linear-gradient(180deg, var(--bg-panel), var(--bg));
@@ -123,6 +119,41 @@
     text-transform: uppercase;
     letter-spacing: 1.5px;
     padding: 6px 10px 12px;
+  }
+
+  /* Item de nivel superior (Presentación) */
+  .top-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 15.5px;
+    color: var(--text);
+    letter-spacing: 0.3px;
+    user-select: none;
+    transition: all 0.15s ease;
+    margin-bottom: 10px;
+  }
+
+  .top-item:hover{ background: rgba(255,255,255,0.03); }
+
+  .top-item.active{
+    color: var(--neon);
+    background: rgba(0,229,255,0.09);
+  }
+
+  .top-item.active .doc-icon{ color: var(--neon); }
+
+  .doc-icon{ color: var(--neon-dim); flex-shrink: 0; }
+
+  .sidebar-divider{
+    height: 1px;
+    background: var(--border-soft);
+    margin: 4px 8px 14px;
   }
 
   .category{
@@ -218,17 +249,105 @@
     box-shadow: 0 0 6px 1px var(--neon-glow);
   }
 
-  /* ---------- Main panel ---------- */
   .main{
     padding: 28px 34px 60px;
     overflow-y: auto;
   }
 
-  /* Welcome / hero state */
-  .hero{
-    max-width: 760px;
-    margin-top: 4vh;
+  /* ---------- Vista de presentación (portada) ---------- */
+  .presentation-view{ display: none; max-width: 760px; margin: 3vh auto 0; }
+  .presentation-view.active{ display: block; }
+
+  .cover-card{
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    border-radius: 14px;
+    padding: 48px 44px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,229,255,0.06);
   }
+
+  .cover-eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon);
+    font-size: 11.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .cover-card h1{
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: 0.3px;
+    color: var(--text);
+  }
+
+  .cover-card h2{
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--muted);
+  }
+
+  .cover-divider{
+    width: 60px;
+    height: 2px;
+    background: var(--neon);
+    box-shadow: 0 0 8px var(--neon-glow);
+    margin: 26px auto;
+    border: none;
+  }
+
+  .cover-title{
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--neon);
+    text-shadow: 0 0 18px var(--neon-glow);
+    margin: 0 0 30px;
+  }
+
+  .cover-details{
+    display: grid;
+    gap: 14px;
+    text-align: left;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .cover-row{
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    background: var(--bg-panel-2);
+    font-size: 14px;
+  }
+
+  .cover-row .k{
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    align-self: center;
+  }
+
+  .cover-row .v{
+    color: var(--text);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* ---------- Vista de bienvenida (ya no es la vista inicial, se deja por si se usa) ---------- */
+  .hero{ display: none; max-width: 760px; margin-top: 4vh; }
+  .hero.active{ display: block; }
 
   .eyebrow{
     font-family: 'JetBrains Mono', monospace;
@@ -302,7 +421,6 @@
 
   .hint svg{ color: var(--neon); flex-shrink: 0; }
 
-  /* Work view */
   .work-view{ display: none; max-width: 980px; }
   .work-view.active{ display: block; }
 
@@ -458,7 +576,6 @@
     gap: 8px;
   }
 
-  /* ---------- Footer ---------- */
   footer{
     text-align: center;
     padding: 30px 20px 40px;
@@ -468,7 +585,6 @@
     letter-spacing: 0.4px;
   }
 
-  /* ---------- Mobile ---------- */
   @media (max-width: 860px){
     .layout{ grid-template-columns: 1fr; }
     .menu-toggle{ display: flex; align-items:center; justify-content:center; }
@@ -492,6 +608,10 @@
     .hero h1{ font-size: 32px; }
     .main{ padding: 22px 18px 50px; }
     .pdf-frame-wrap{ height: 420px; }
+    .cover-card{ padding: 34px 22px; }
+    .cover-title{ font-size: 26px; }
+    .cover-row{ flex-direction: column; gap: 4px; }
+    .cover-row .v{ text-align: left; }
   }
 </style>
 </head>
@@ -513,11 +633,38 @@
 <div class="layout">
 
   <aside class="sidebar" id="sidebar">
+    <div class="top-item active" id="presentationNavItem">
+      <svg class="doc-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span>Presentación</span>
+    </div>
+    <div class="sidebar-divider"></div>
+
     <div class="sidebar-title">// explorador de trabajos</div>
     <div id="categoriesContainer"></div>
   </aside>
 
   <main class="main">
+
+    <section class="presentation-view active" id="presentationView">
+      <div class="cover-card">
+        <div class="cover-eyebrow">&lt;/&gt; portada del portafolio</div>
+        <h1>Universidad Tecnológica de Panamá</h1>
+        <h2>Facultad de Ingeniería de Sistemas Computacionales</h2>
+        <h2>Licenciatura en Ingeniería en Sistemas y Computación</h2>
+
+        <hr class="cover-divider">
+
+        <div class="cover-title">Portafolio Académico</div>
+
+        <div class="cover-details">
+          <div class="cover-row"><span class="k">Docente</span><span class="v">Napoleón Ibarra</span></div>
+          <div class="cover-row"><span class="k">Estudiante</span><span class="v">Eduardo Samudio</span></div>
+          <div class="cover-row"><span class="k">Asignatura</span><span class="v">Herramientas 4</span></div>
+          <div class="cover-row"><span class="k">Grupo</span><span class="v">2IL141</span></div>
+          <div class="cover-row"><span class="k">Año</span><span class="v">2026</span></div>
+        </div>
+      </div>
+    </section>
 
     <section class="hero" id="heroSection">
       <div class="eyebrow">&lt;/&gt; portafolio de curso</div>
@@ -571,7 +718,7 @@
 
         <div class="note-row" id="appNote" style="display:none;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          Este trabajo es una investigación y no incluye una aplicación desarrollada.
+          Este trabajo no incluye una aplicación desarrollada.
         </div>
       </div>
     </section>
@@ -613,7 +760,7 @@ const DATA = {
       name: "Talleres",
       icon: "folder",
       items: [
-        { id: "taller1", title: "Taller Práctico 1", pdf: "assets/pdfs/taller-practico-1.pdf", app: "assets/apps/taller-practico-1.zip" },
+        { id: "taller1", title: "Taller Práctico 1", pdf: "assets/pdfs/taller-practico-1.pdf", app: null },
         { id: "taller2", title: "Taller Práctico 2", pdf: "assets/pdfs/taller-practico-2.pdf", app: "assets/apps/taller-practico-2.zip" },
       ]
     },
@@ -675,7 +822,6 @@ DATA.categories.forEach(cat => {
   categoriesContainer.appendChild(catEl);
 });
 
-// Stat cards
 const stats = [
   { num: totalWorks, label: "Trabajos totales" },
   { num: DATA.categories.length, label: "Categorías" },
@@ -687,8 +833,10 @@ stats.forEach(s => {
   statRow.appendChild(card);
 });
 
-/* ======================= SELECCIÓN DE TRABAJO ======================= */
+/* ======================= VISTAS ======================= */
 
+const presentationView = document.getElementById('presentationView');
+const presentationNavItem = document.getElementById('presentationNavItem');
 const heroSection = document.getElementById('heroSection');
 const workView = document.getElementById('workView');
 const workTag = document.getElementById('workTag');
@@ -701,33 +849,43 @@ const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 const downloadAppBtn = document.getElementById('downloadAppBtn');
 const appNote = document.getElementById('appNote');
 
-function selectWork(cat, item, el){
-  // Estado activo en la barra lateral
+function clearActiveStates(){
   document.querySelectorAll('.file-item').forEach(f => f.classList.remove('active'));
+  presentationNavItem.classList.remove('active');
+}
+
+function showPresentation(){
+  clearActiveStates();
+  presentationNavItem.classList.add('active');
+  presentationView.classList.add('active');
+  heroSection.classList.remove('active');
+  workView.classList.remove('active');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectWork(cat, item, el){
+  clearActiveStates();
   el.classList.add('active');
 
-  // Mostrar vista de trabajo
-  heroSection.style.display = 'none';
+  presentationView.classList.remove('active');
+  heroSection.classList.remove('active');
   workView.classList.add('active');
 
-  // Contenido
   workTag.textContent = cat.name;
   workTitle.textContent = item.title;
   tabName.textContent = item.pdf.split('/').pop();
 
-  // PDF
   pdfFrame.src = item.pdf;
-  pdfFrame.onerror = () => { pdfMissing.style.display = 'flex'; };
   pdfMissing.style.display = 'none';
   pdfMissingPath.textContent = item.pdf;
   downloadPdfBtn.href = item.pdf;
 
-  // Comprobar si el PDF existe
   fetch(item.pdf, { method: 'HEAD' }).then(res => {
     pdfMissing.style.display = res.ok ? 'none' : 'flex';
   }).catch(() => { pdfMissing.style.display = 'flex'; });
 
-  // App (no aplica para investigaciones)
   if (item.app){
     downloadAppBtn.style.display = 'inline-flex';
     downloadAppBtn.href = item.app;
@@ -737,11 +895,12 @@ function selectWork(cat, item, el){
     appNote.style.display = 'flex';
   }
 
-  // Cerrar sidebar en mobile
   sidebar.classList.remove('open');
   overlay.classList.remove('show');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+presentationNavItem.addEventListener('click', showPresentation);
 
 /* ======================= MENU MOBILE ======================= */
 const sidebar = document.getElementById('sidebar');
@@ -757,8 +916,8 @@ overlay.addEventListener('click', () => {
   overlay.classList.remove('show');
 });
 
-// Abrir la primera categoría por defecto
-document.querySelector('.category')?.classList.add('open');
+// La página siempre inicia en "Presentación"
+showPresentation();
 </script>
 
 </body>
