@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portafolio Académico — Herramientas de Programación 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #05070d;
+    --bg-panel: #0a0f1c;
+    --bg-panel-2: #0d1426;
+    --neon: #00e5ff;
+    --neon-dim: #0099b8;
+    --neon-glow: rgba(0, 229, 255, 0.35);
+    --indigo: #4f6df5;
+    --text: #eaf2ff;
+    --muted: #7c8aa8;
+    --border: rgba(0, 229, 255, 0.14);
+    --border-soft: rgba(255,255,255,0.06);
+    --danger: #ff5470;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    height: 100%;
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(0,229,255,0.07), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(79,109,245,0.08), transparent 45%);
+    background-attachment: fixed;
+  }
+
+  ::selection{ background: var(--neon-glow); color: #fff; }
+
+  /* ---------- Scrollbars ---------- */
+  ::-webkit-scrollbar{ width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track{ background: transparent; }
+  ::-webkit-scrollbar-thumb{ background: rgba(0,229,255,0.25); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover{ background: rgba(0,229,255,0.45); }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border-soft);
+    background: rgba(5,7,13,0.9);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.4px;
+  }
+
+  .brand .dot{
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--neon);
+    box-shadow: 0 0 8px 2px var(--neon-glow);
+  }
+
+  .brand small{
+    display:block;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .menu-toggle{
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--neon);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* ---------- Sidebar (file explorer style) ---------- */
+  .sidebar{
+    border-right: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, var(--bg-panel), var(--bg));
+    padding: 18px 12px 40px;
+    overflow-y: auto;
+  }
+
+  .sidebar-title{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 10px 12px;
+  }
+
+  .category{
+    margin-bottom: 4px;
+  }
+
+  .category-head{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 15.5px;
+    color: var(--text);
+    letter-spacing: 0.3px;
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+
+  .category-head:hover{ background: rgba(255,255,255,0.03); }
+
+  .chevron{
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    color: var(--neon);
+  }
+
+  .category.open .chevron{ transform: rotate(90deg); }
+
+  .folder-icon{ color: var(--neon-dim); flex-shrink: 0; }
+
+  .count-badge{
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-soft);
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .file-list{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    padding-left: 14px;
+    border-left: 1px dashed rgba(0,229,255,0.15);
+    margin-left: 18px;
+  }
+
+  .category.open .file-list{ max-height: 600px; }
+
+  .file-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .file-item::before{
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+
+  .file-item:hover{
+    color: var(--text);
+    background: rgba(0,229,255,0.05);
+  }
+
+  .file-item.active{
+    color: var(--neon);
+    background: rgba(0,229,255,0.09);
+    font-weight: 500;
+  }
+
+  .file-item.active::before{
+    background: var(--neon);
+    box-shadow: 0 0 6px 1px var(--neon-glow);
+  }
+
+  /* ---------- Main panel ---------- */
+  .main{
+    padding: 28px 34px 60px;
+    overflow-y: auto;
+  }
+
+  /* Welcome / hero state */
+  .hero{
+    max-width: 760px;
+    margin-top: 4vh;
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon);
+    font-size: 12.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .hero h1{
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 14px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero h1 span{
+    color: var(--neon);
+    text-shadow: 0 0 18px var(--neon-glow);
+  }
+
+  .hero p{
+    color: var(--muted);
+    font-size: 15.5px;
+    line-height: 1.7;
+    max-width: 560px;
+  }
+
+  .stat-row{
+    display: flex;
+    gap: 14px;
+    margin-top: 34px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card{
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    border-radius: 10px;
+    padding: 16px 18px;
+    min-width: 130px;
+  }
+
+  .stat-card .num{
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--neon);
+  }
+
+  .stat-card .label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 2px;
+  }
+
+  .hint{
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+
+  .hint svg{ color: var(--neon); flex-shrink: 0; }
+
+  /* Work view */
+  .work-view{ display: none; max-width: 980px; }
+  .work-view.active{ display: block; }
+
+  .tab-bar{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    padding: 10px 16px;
+  }
+
+  .tab-dot{ width: 10px; height: 10px; border-radius: 50%; }
+  .tab-dot.red{ background:#ff5f57; }
+  .tab-dot.yellow{ background:#febc2e; }
+  .tab-dot.green{ background:#28c840; }
+
+  .tab-name{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+
+  .work-card{
+    border: 1px solid var(--border-soft);
+    border-radius: 0 0 12px 12px;
+    background: var(--bg-panel-2);
+    padding: 26px 28px 28px;
+  }
+
+  .work-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .work-tag{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--neon);
+    border: 1px solid var(--border);
+    background: rgba(0,229,255,0.06);
+    padding: 3px 9px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .work-title{
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .actions{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn-primary{
+    background: var(--neon);
+    color: #04121a;
+    box-shadow: 0 0 16px var(--neon-glow);
+  }
+  .btn-primary:hover{ background: #33ecff; }
+
+  .btn-secondary{
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover{
+    border-color: var(--neon);
+    color: var(--neon);
+    background: rgba(0,229,255,0.05);
+  }
+
+  .btn:disabled, .btn.disabled{
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .pdf-frame-wrap{
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0b0e16;
+    height: 640px;
+    position: relative;
+  }
+
+  .pdf-frame-wrap iframe{
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  .pdf-missing{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13.5px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .pdf-missing code{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--neon);
+    background: rgba(0,229,255,0.06);
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+
+  .note-row{
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    text-align: center;
+    padding: 30px 20px 40px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.4px;
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 860px){
+    .layout{ grid-template-columns: 1fr; }
+    .menu-toggle{ display: flex; align-items:center; justify-content:center; }
+    .sidebar{
+      position: fixed;
+      top: 56px; left: 0; bottom: 0;
+      width: 260px;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 40;
+      box-shadow: 20px 0 40px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{ transform: translateX(0); }
+    .overlay{
+      display:none;
+      position: fixed; inset: 56px 0 0 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 35;
+    }
+    .overlay.show{ display:block; }
+    .hero h1{ font-size: 32px; }
+    .main{ padding: 22px 18px 50px; }
+    .pdf-frame-wrap{ height: 420px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <div>
+      Portafolio Académico
+      <small>Herramientas de Programación 4</small>
+    </div>
+  </div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">// explorador de trabajos</div>
+    <div id="categoriesContainer"></div>
+  </aside>
+
+  <main class="main">
+
+    <section class="hero" id="heroSection">
+      <div class="eyebrow">&lt;/&gt; portafolio de curso</div>
+      <h1>Trabajos desarrollados <span>durante el año</span></h1>
+      <p>
+        Este portafolio reúne los parciales, investigaciones, talleres y ejercicios
+        prácticos realizados a lo largo del curso. Seleccioná un trabajo en el panel
+        izquierdo para ver el documento y descargar los archivos correspondientes.
+      </p>
+
+      <div class="stat-row" id="statRow"></div>
+
+      <div class="hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        Elegí una categoría en el menú y luego un trabajo para comenzar
+      </div>
+    </section>
+
+    <section class="work-view" id="workView">
+      <div class="tab-bar">
+        <span class="tab-dot red"></span>
+        <span class="tab-dot yellow"></span>
+        <span class="tab-dot green"></span>
+        <span class="tab-name" id="tabName">documento.pdf</span>
+      </div>
+      <div class="work-card">
+        <div class="work-header">
+          <div>
+            <span class="work-tag" id="workTag">Categoría</span>
+            <h2 class="work-title" id="workTitle">Título del trabajo</h2>
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary" id="downloadPdfBtn" download>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              Descargar PDF
+            </a>
+            <a class="btn btn-secondary" id="downloadAppBtn" download>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22h6"/></svg>
+              Descargar App
+            </a>
+          </div>
+        </div>
+
+        <div class="pdf-frame-wrap">
+          <iframe id="pdfFrame" src=""></iframe>
+          <div class="pdf-missing" id="pdfMissing" style="display:none;">
+            <span>Todavía no se subió el PDF para este trabajo.</span>
+            <code id="pdfMissingPath">assets/pdfs/archivo.pdf</code>
+          </div>
+        </div>
+
+        <div class="note-row" id="appNote" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Este trabajo es una investigación y no incluye una aplicación desarrollada.
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>© 2026 · Portafolio académico generado para GitHub Pages</footer>
+
+<script>
+/* =======================================================
+   CONFIGURACIÓN DE TRABAJOS
+   Para agregar o editar un trabajo, modificá este arreglo.
+   - pdf: ruta al archivo PDF dentro de assets/pdfs/
+   - app: ruta al archivo de la app dentro de assets/apps/ (null si no aplica)
+   ======================================================= */
+const DATA = {
+  categories: [
+    {
+      id: "parciales",
+      name: "Parciales",
+      icon: "folder",
+      items: [
+        { id: "parcial1", title: "Examen Parcial 1", pdf: "assets/pdfs/examen-parcial-1.pdf", app: "assets/apps/examen-parcial-1.zip" },
+        { id: "parcial2", title: "Examen Parcial 2", pdf: "assets/pdfs/examen-parcial-2.pdf", app: "assets/apps/examen-parcial-2.zip" },
+      ]
+    },
+    {
+      id: "investigaciones",
+      name: "Investigaciones",
+      icon: "folder",
+      items: [
+        { id: "investigacion1", title: "Investigación 1", pdf: "assets/pdfs/investigacion-1.pdf", app: null },
+        { id: "investigacion2", title: "Investigación 2", pdf: "assets/pdfs/investigacion-2.pdf", app: null },
+      ]
+    },
+    {
+      id: "talleres",
+      name: "Talleres",
+      icon: "folder",
+      items: [
+        { id: "taller1", title: "Taller Práctico 1", pdf: "assets/pdfs/taller-practico-1.pdf", app: "assets/apps/taller-practico-1.zip" },
+        { id: "taller2", title: "Taller Práctico 2", pdf: "assets/pdfs/taller-practico-2.pdf", app: "assets/apps/taller-practico-2.zip" },
+      ]
+    },
+    {
+      id: "ejercicios",
+      name: "Ejercicios",
+      icon: "folder",
+      items: [
+        { id: "ejercicio1", title: "Ejercicio Práctico 1", pdf: "assets/pdfs/ejercicio-practico-1.pdf", app: "assets/apps/ejercicio-practico-1.zip" },
+        { id: "ejercicio2", title: "Ejercicio Práctico 2", pdf: "assets/pdfs/ejercicio-practico-2.pdf", app: "assets/apps/ejercicio-practico-2.zip" },
+        { id: "ejercicio3", title: "Ejercicio Práctico 3", pdf: "assets/pdfs/ejercicio-practico-3.pdf", app: "assets/apps/ejercicio-practico-3.zip" },
+      ]
+    }
+  ]
+};
+
+/* ======================= RENDER ======================= */
+
+const categoriesContainer = document.getElementById('categoriesContainer');
+const statRow = document.getElementById('statRow');
+
+function folderSVG(){
+  return `<svg class="folder-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>`;
+}
+function chevronSVG(){
+  return `<svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>`;
+}
+
+let totalWorks = 0;
+
+DATA.categories.forEach(cat => {
+  totalWorks += cat.items.length;
+
+  const catEl = document.createElement('div');
+  catEl.className = 'category';
+  catEl.dataset.cat = cat.id;
+
+  const head = document.createElement('div');
+  head.className = 'category-head';
+  head.innerHTML = `${chevronSVG()}${folderSVG()}<span>${cat.name}</span><span class="count-badge">${cat.items.length}</span>`;
+  head.addEventListener('click', () => {
+    catEl.classList.toggle('open');
+  });
+
+  const list = document.createElement('div');
+  list.className = 'file-list';
+
+  cat.items.forEach(item => {
+    const fileEl = document.createElement('div');
+    fileEl.className = 'file-item';
+    fileEl.textContent = item.title;
+    fileEl.dataset.id = item.id;
+    fileEl.addEventListener('click', () => selectWork(cat, item, fileEl));
+    list.appendChild(fileEl);
+  });
+
+  catEl.appendChild(head);
+  catEl.appendChild(list);
+  categoriesContainer.appendChild(catEl);
+});
+
+// Stat cards
+const stats = [
+  { num: totalWorks, label: "Trabajos totales" },
+  { num: DATA.categories.length, label: "Categorías" },
+];
+stats.forEach(s => {
+  const card = document.createElement('div');
+  card.className = 'stat-card';
+  card.innerHTML = `<div class="num">${s.num}</div><div class="label">${s.label}</div>`;
+  statRow.appendChild(card);
+});
+
+/* ======================= SELECCIÓN DE TRABAJO ======================= */
+
+const heroSection = document.getElementById('heroSection');
+const workView = document.getElementById('workView');
+const workTag = document.getElementById('workTag');
+const workTitle = document.getElementById('workTitle');
+const tabName = document.getElementById('tabName');
+const pdfFrame = document.getElementById('pdfFrame');
+const pdfMissing = document.getElementById('pdfMissing');
+const pdfMissingPath = document.getElementById('pdfMissingPath');
+const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+const downloadAppBtn = document.getElementById('downloadAppBtn');
+const appNote = document.getElementById('appNote');
+
+function selectWork(cat, item, el){
+  // Estado activo en la barra lateral
+  document.querySelectorAll('.file-item').forEach(f => f.classList.remove('active'));
+  el.classList.add('active');
+
+  // Mostrar vista de trabajo
+  heroSection.style.display = 'none';
+  workView.classList.add('active');
+
+  // Contenido
+  workTag.textContent = cat.name;
+  workTitle.textContent = item.title;
+  tabName.textContent = item.pdf.split('/').pop();
+
+  // PDF
+  pdfFrame.src = item.pdf;
+  pdfFrame.onerror = () => { pdfMissing.style.display = 'flex'; };
+  pdfMissing.style.display = 'none';
+  pdfMissingPath.textContent = item.pdf;
+  downloadPdfBtn.href = item.pdf;
+
+  // Comprobar si el PDF existe
+  fetch(item.pdf, { method: 'HEAD' }).then(res => {
+    pdfMissing.style.display = res.ok ? 'none' : 'flex';
+  }).catch(() => { pdfMissing.style.display = 'flex'; });
+
+  // App (no aplica para investigaciones)
+  if (item.app){
+    downloadAppBtn.style.display = 'inline-flex';
+    downloadAppBtn.href = item.app;
+    appNote.style.display = 'none';
+  } else {
+    downloadAppBtn.style.display = 'none';
+    appNote.style.display = 'flex';
+  }
+
+  // Cerrar sidebar en mobile
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ======================= MENU MOBILE ======================= */
+const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menuToggle');
+const overlay = document.getElementById('overlay');
+
+menuToggle.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+});
+
+// Abrir la primera categoría por defecto
+document.querySelector('.category')?.classList.add('open');
+</script>
+
+</body>
+</html>
